@@ -4,7 +4,7 @@
 # About the project
 
 # Contact
-* Anges Grond, [agnes.grond@uni-graz.at](mailto:agnes.grond@uni-graz.at)
+* Agnes Grond, [agnes.grond@uni-graz.at](mailto:agnes.grond@uni-graz.at)
 * Salih Akin, [salih.akin@univ-rouen.fr](mailto:salih.akin@univ-rouen.fr)
 * Data Management and Visualisation: Johanna Ofenauer, [johanna.ofenauer@uni-graz.at](mailto:johanna.ofenauer@uni-graz.at)
 
