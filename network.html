@@ -1,0 +1,526 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Network | The language use web</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </head>
+  <body>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Network</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="./sankey.html">Sankey Diagram</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+        </svg> GitHub</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  <div class="container-md">
+    <div id="network" class="network"><html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script>function neighbourhoodHighlight(params) {
+  // console.log("in nieghbourhoodhighlight");
+  allNodes = nodes.get({ returnType: "Object" });
+  // originalNodes = JSON.parse(JSON.stringify(allNodes));
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    highlightActive = true;
+    var i, j;
+    var selectedNode = params.nodes[0];
+    var degrees = 2;
+
+    // mark all nodes as hard to read.
+    for (let nodeId in allNodes) {
+      // nodeColors[nodeId] = allNodes[nodeId].color;
+      allNodes[nodeId].color = "rgba(200,200,200,0.5)";
+      if (allNodes[nodeId].hiddenLabel === undefined) {
+        allNodes[nodeId].hiddenLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+    var connectedNodes = network.getConnectedNodes(selectedNode);
+    var allConnectedNodes = [];
+
+    // get the second degree nodes
+    for (i = 1; i < degrees; i++) {
+      for (j = 0; j < connectedNodes.length; j++) {
+        allConnectedNodes = allConnectedNodes.concat(
+          network.getConnectedNodes(connectedNodes[j])
+        );
+      }
+    }
+
+    // all second degree nodes get a different color and their label back
+    for (i = 0; i < allConnectedNodes.length; i++) {
+      // allNodes[allConnectedNodes[i]].color = "pink";
+      allNodes[allConnectedNodes[i]].color = "rgba(150,150,150,0.75)";
+      if (allNodes[allConnectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[allConnectedNodes[i]].label =
+          allNodes[allConnectedNodes[i]].hiddenLabel;
+        allNodes[allConnectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // all first degree nodes get their own color and their label back
+    for (i = 0; i < connectedNodes.length; i++) {
+      // allNodes[connectedNodes[i]].color = undefined;
+      allNodes[connectedNodes[i]].color = nodeColors[connectedNodes[i]];
+      if (allNodes[connectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[connectedNodes[i]].label =
+          allNodes[connectedNodes[i]].hiddenLabel;
+        allNodes[connectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // the main node gets its own color and its label back.
+    // allNodes[selectedNode].color = undefined;
+    allNodes[selectedNode].color = nodeColors[selectedNode];
+    if (allNodes[selectedNode].hiddenLabel !== undefined) {
+      allNodes[selectedNode].label = allNodes[selectedNode].hiddenLabel;
+      allNodes[selectedNode].hiddenLabel = undefined;
+    }
+  } else if (highlightActive === true) {
+    // console.log("highlightActive was true");
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      // allNodes[nodeId].color = "purple";
+      allNodes[nodeId].color = nodeColors[nodeId];
+      // delete allNodes[nodeId].color;
+      if (allNodes[nodeId].hiddenLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].hiddenLabel;
+        allNodes[nodeId].hiddenLabel = undefined;
+      }
+    }
+    highlightActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    // console.log("Nothing was selected");
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        // allNodes[nodeId].color = {};
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function filterHighlight(params) {
+  allNodes = nodes.get({ returnType: "Object" });
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    filterActive = true;
+    let selectedNodes = params.nodes;
+
+    // hiding all nodes and saving the label
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = true;
+      if (allNodes[nodeId].savedLabel === undefined) {
+        allNodes[nodeId].savedLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+
+    for (let i=0; i < selectedNodes.length; i++) {
+      allNodes[selectedNodes[i]].hidden = false;
+      if (allNodes[selectedNodes[i]].savedLabel !== undefined) {
+        allNodes[selectedNodes[i]].label = allNodes[selectedNodes[i]].savedLabel;
+        allNodes[selectedNodes[i]].savedLabel = undefined;
+      }
+    }
+
+  } else if (filterActive === true) {
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = false;
+      if (allNodes[nodeId].savedLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].savedLabel;
+        allNodes[nodeId].savedLabel = undefined;
+      }
+    }
+    filterActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function selectNode(nodes) {
+  network.selectNodes(nodes);
+  neighbourhoodHighlight({ nodes: nodes });
+  return nodes;
+}
+
+function selectNodes(nodes) {
+  network.selectNodes(nodes);
+  filterHighlight({nodes: nodes});
+  return nodes;
+}
+
+function highlightFilter(filter) {
+  let selectedNodes = []
+  let selectedProp = filter['property']
+  if (filter['item'] === 'node') {
+    let allNodes = nodes.get({ returnType: "Object" });
+    for (let nodeId in allNodes) {
+      if (allNodes[nodeId][selectedProp] && filter['value'].includes((allNodes[nodeId][selectedProp]).toString())) {
+        selectedNodes.push(nodeId)
+      }
+    }
+  }
+  else if (filter['item'] === 'edge'){
+    let allEdges = edges.get({returnType: 'object'});
+    // check if the selected property exists for selected edge and select the nodes connected to the edge
+    for (let edge in allEdges) {
+      if (allEdges[edge][selectedProp] && filter['value'].includes((allEdges[edge][selectedProp]).toString())) {
+        selectedNodes.push(allEdges[edge]['from'])
+        selectedNodes.push(allEdges[edge]['to'])
+      }
+    }
+  }
+  selectNodes(selectedNodes)
+}</script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+            
+            
+            
+            
+            
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tom-select/2.0.0-rc.4/css/tom-select.min.css" integrity="sha512-43fHB3GLgZfz8QXl1RPQ8O66oIgv3po9cJ5erMt1c4QISq9dYb195T3vr5ImnJPXuVroKcGBPXBFKETW8jrPNQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/tom-select/2.0.0-rc.4/js/tom-select.complete.js" integrity="sha512-jeF9CfnvzDiw9G9xiksVjxR2lib44Gnovvkv+3CgCG6NXCD4gqlA5nDAVW5WjpA+i+/zKsUWV5xNEbW1X/HH0Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 550px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+                <div id="select-menu" class="card-header">
+                    <div class="row no-gutters">
+                        <div class="col-10 pb-2">
+                            <select
+                            class="form-select"
+                            aria-label="Default select example"
+                            onchange="selectNode([value]);"
+                            id="select-node"
+                            placeholder="Select node..."
+                            >
+                                <option selected>Select a Node by ID</option>
+                                
+                                    <option value="television">television</option>
+                                
+                                    <option value="Kurmanji">Kurmanji</option>
+                                
+                                    <option value="Turkish">Turkish</option>
+                                
+                                    <option value="Other language">Other language</option>
+                                
+                                    <option value="French">French</option>
+                                
+                                    <option value="Şexbizinî">Şexbizinî</option>
+                                
+                                    <option value="German">German</option>
+                                
+                                    <option value="No language given">No language given</option>
+                                
+                                    <option value="youtube">youtube</option>
+                                
+                                    <option value="music">music</option>
+                                
+                                    <option value="facebook">facebook</option>
+                                
+                                    <option value="twitter">twitter</option>
+                                
+                                    <option value="instagram">instagram</option>
+                                
+                                    <option value="whatsapp">whatsapp</option>
+                                
+                                    <option value="telegram">telegram</option>
+                                
+                                    <option value="tiktok">tiktok</option>
+                                
+                                    <option value="discord">discord</option>
+                                
+                                    <option value="email">email</option>
+                                
+                                    <option value="sms">sms</option>
+                                
+                                    <option value="books">books</option>
+                                
+                                    <option value="diaries">diaries</option>
+                                
+                                    <option value="shopping list">shopping list</option>
+                                
+                                    <option value="jokes">jokes</option>
+                                
+                                    <option value="songs">songs</option>
+                                
+                                    <option value="other media">other media</option>
+                                
+                                    <option value="at the doctor">at the doctor</option>
+                                
+                                    <option value="at the police">at the police</option>
+                                
+                                    <option value="at the bank">at the bank</option>
+                                
+                                    <option value="at court">at court</option>
+                                
+                                    <option value="with teachers at school">with teachers at school</option>
+                                
+                                    <option value="when asking for directions">when asking for directions</option>
+                                
+                                    <option value="with customers">with customers</option>
+                                
+                                    <option value="when shopping">when shopping</option>
+                                
+                                    <option value="at the restaurant">at the restaurant</option>
+                                
+                                    <option value="at weddings">at weddings</option>
+                                
+                                    <option value="at funerals">at funerals</option>
+                                
+                                    <option value="at religious ceremonies">at religious ceremonies</option>
+                                
+                                    <option value="when dreaming">when dreaming</option>
+                                
+                                    <option value="when counting">when counting</option>
+                                
+                                    <option value="when praying">when praying</option>
+                                
+                                    <option value="shouting at children">shouting at children</option>
+                                
+                                    <option value="explanations to children">explanations to children</option>
+                                
+                                    <option value="when cursing">when cursing</option>
+                                
+                                    <option value="when joking">when joking</option>
+                                
+                                    <option value="speaking about private topics">speaking about private topics</option>
+                                
+                                    <option value="discussing">discussing</option>
+                                
+                                    <option value="singing">singing</option>
+                                
+                                    <option value="playing">playing</option>
+                                
+                                    <option value="talking to a beloved person">talking to a beloved person</option>
+                                
+                                    <option value="partner">partner</option>
+                                
+                                    <option value="children">children</option>
+                                
+                                    <option value="mother">mother</option>
+                                
+                                    <option value="father">father</option>
+                                
+                                    <option value="siblings">siblings</option>
+                                
+                                    <option value="friends">friends</option>
+                                
+                                    <option value="relatives">relatives</option>
+                                
+                                    <option value="neighbours">neighbours</option>
+                                
+                                    <option value="poems">poems</option>
+                                
+                                    <option value="stories">stories</option>
+                                
+                                    <option value="letters">letters</option>
+                                
+                                    <option value="Dutch">Dutch</option>
+                                
+                            </select>
+                        </div>
+                        <div class="col-2 pb-2">
+                            <button type="button" class="btn btn-primary btn-block" onclick="neighbourhoodHighlight({nodes: []});">Reset Selection</button>
+                        </div>
+                    </div>
+                </div>
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+                  new TomSelect("#select-node",{
+                      create: false,
+                      sortField: {
+                          field: "text",
+                          direction: "asc"
+                      }
+                  });
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#6a040f", "font": {"color": "black"}, "id": "television", "label": "television", "shape": "dot", "size": 10}, {"color": "#fd7e14", "font": {"color": "black"}, "id": "Kurmanji", "label": "Kurmanji", "shape": "dot", "size": 10}, {"color": "#fd7e14", "font": {"color": "black"}, "id": "Turkish", "label": "Turkish", "shape": "dot", "size": 10}, {"color": "#fd7e14", "font": {"color": "black"}, "id": "Other language", "label": "Other language", "shape": "dot", "size": 10}, {"color": "#fd7e14", "font": {"color": "black"}, "id": "French", "label": "French", "shape": "dot", "size": 10}, {"color": "#fd7e14", "font": {"color": "black"}, "id": "\u015eexbizin\u00ee", "label": "\u015eexbizin\u00ee", "shape": "dot", "size": 10}, {"color": "#fd7e14", "font": {"color": "black"}, "id": "German", "label": "German", "shape": "dot", "size": 10}, {"color": "#fd7e14", "font": {"color": "black"}, "id": "No language given", "label": "No language given", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "youtube", "label": "youtube", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "music", "label": "music", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "facebook", "label": "facebook", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "twitter", "label": "twitter", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "instagram", "label": "instagram", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "whatsapp", "label": "whatsapp", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "telegram", "label": "telegram", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "tiktok", "label": "tiktok", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "discord", "label": "discord", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "email", "label": "email", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "sms", "label": "sms", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "books", "label": "books", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "diaries", "label": "diaries", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "shopping list", "label": "shopping list", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "jokes", "label": "jokes", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "songs", "label": "songs", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "other media", "label": "other media", "shape": "dot", "size": 10}, {"color": "#118ab2", "font": {"color": "black"}, "id": "at the doctor", "label": "at the doctor", "shape": "dot", "size": 10}, {"color": "#118ab2", "font": {"color": "black"}, "id": "at the police", "label": "at the police", "shape": "dot", "size": 10}, {"color": "#118ab2", "font": {"color": "black"}, "id": "at the bank", "label": "at the bank", "shape": "dot", "size": 10}, {"color": "#118ab2", "font": {"color": "black"}, "id": "at court", "label": "at court", "shape": "dot", "size": 10}, {"color": "#118ab2", "font": {"color": "black"}, "id": "with teachers at school", "label": "with teachers at school", "shape": "dot", "size": 10}, {"color": "#118ab2", "font": {"color": "black"}, "id": "when asking for directions", "label": "when asking for directions", "shape": "dot", "size": 10}, {"color": "#118ab2", "font": {"color": "black"}, "id": "with customers", "label": "with customers", "shape": "dot", "size": 10}, {"color": "#118ab2", "font": {"color": "black"}, "id": "when shopping", "label": "when shopping", "shape": "dot", "size": 10}, {"color": "#118ab2", "font": {"color": "black"}, "id": "at the restaurant", "label": "at the restaurant", "shape": "dot", "size": 10}, {"color": "#118ab2", "font": {"color": "black"}, "id": "at weddings", "label": "at weddings", "shape": "dot", "size": 10}, {"color": "#118ab2", "font": {"color": "black"}, "id": "at funerals", "label": "at funerals", "shape": "dot", "size": 10}, {"color": "#118ab2", "font": {"color": "black"}, "id": "at religious ceremonies", "label": "at religious ceremonies", "shape": "dot", "size": 10}, {"color": "#dc3545", "font": {"color": "black"}, "id": "when dreaming", "label": "when dreaming", "shape": "dot", "size": 10}, {"color": "#dc3545", "font": {"color": "black"}, "id": "when counting", "label": "when counting", "shape": "dot", "size": 10}, {"color": "#dc3545", "font": {"color": "black"}, "id": "when praying", "label": "when praying", "shape": "dot", "size": 10}, {"color": "#dc3545", "font": {"color": "black"}, "id": "shouting at children", "label": "shouting at children", "shape": "dot", "size": 10}, {"color": "#dc3545", "font": {"color": "black"}, "id": "explanations to children", "label": "explanations to children", "shape": "dot", "size": 10}, {"color": "#dc3545", "font": {"color": "black"}, "id": "when cursing", "label": "when cursing", "shape": "dot", "size": 10}, {"color": "#dc3545", "font": {"color": "black"}, "id": "when joking", "label": "when joking", "shape": "dot", "size": 10}, {"color": "#dc3545", "font": {"color": "black"}, "id": "speaking about private topics", "label": "speaking about private topics", "shape": "dot", "size": 10}, {"color": "#dc3545", "font": {"color": "black"}, "id": "discussing", "label": "discussing", "shape": "dot", "size": 10}, {"color": "#dc3545", "font": {"color": "black"}, "id": "singing", "label": "singing", "shape": "dot", "size": 10}, {"color": "#dc3545", "font": {"color": "black"}, "id": "playing", "label": "playing", "shape": "dot", "size": 10}, {"color": "#dc3545", "font": {"color": "black"}, "id": "talking to a beloved person", "label": "talking to a beloved person", "shape": "dot", "size": 10}, {"color": "#ffc107", "font": {"color": "black"}, "id": "partner", "label": "partner", "shape": "dot", "size": 10}, {"color": "#ffc107", "font": {"color": "black"}, "id": "children", "label": "children", "shape": "dot", "size": 10}, {"color": "#ffc107", "font": {"color": "black"}, "id": "mother", "label": "mother", "shape": "dot", "size": 10}, {"color": "#ffc107", "font": {"color": "black"}, "id": "father", "label": "father", "shape": "dot", "size": 10}, {"color": "#ffc107", "font": {"color": "black"}, "id": "siblings", "label": "siblings", "shape": "dot", "size": 10}, {"color": "#ffc107", "font": {"color": "black"}, "id": "friends", "label": "friends", "shape": "dot", "size": 10}, {"color": "#ffc107", "font": {"color": "black"}, "id": "relatives", "label": "relatives", "shape": "dot", "size": 10}, {"color": "#ffc107", "font": {"color": "black"}, "id": "neighbours", "label": "neighbours", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "poems", "label": "poems", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "stories", "label": "stories", "shape": "dot", "size": 10}, {"color": "#6a040f", "font": {"color": "black"}, "id": "letters", "label": "letters", "shape": "dot", "size": 10}, {"color": "#fd7e14", "font": {"color": "black"}, "id": "Dutch", "label": "Dutch", "shape": "dot", "size": 10}]);
+                  edges = new vis.DataSet([{"from": "television", "to": "Kurmanji", "width": 1}, {"from": "television", "to": "Turkish", "width": 1}, {"from": "television", "to": "Other language", "width": 1}, {"from": "television", "to": "French", "width": 1}, {"from": "television", "to": "\u015eexbizin\u00ee", "width": 1}, {"from": "television", "to": "German", "width": 1}, {"from": "television", "to": "No language given", "width": 1}, {"from": "youtube", "to": "No language given", "width": 1}, {"from": "youtube", "to": "Turkish", "width": 1}, {"from": "youtube", "to": "\u015eexbizin\u00ee", "width": 1}, {"from": "youtube", "to": "Kurmanji", "width": 1}, {"from": "youtube", "to": "French", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "music", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "facebook", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "twitter", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "instagram", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "whatsapp", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "telegram", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "tiktok", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "discord", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "email", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "sms", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "books", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "diaries", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "shopping list", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "jokes", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "songs", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "other media", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "at the doctor", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "at the police", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "at the bank", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "at court", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "with teachers at school", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "when asking for directions", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "with customers", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "when shopping", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "at the restaurant", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "at weddings", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "at funerals", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "at religious ceremonies", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "when dreaming", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "when counting", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "when praying", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "shouting at children", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "explanations to children", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "when cursing", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "when joking", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "speaking about private topics", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "discussing", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "singing", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "playing", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "talking to a beloved person", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "partner", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "children", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "mother", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "father", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "siblings", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "friends", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "relatives", "width": 1}, {"from": "\u015eexbizin\u00ee", "to": "neighbours", "width": 1}, {"from": "Kurmanji", "to": "music", "width": 1}, {"from": "Kurmanji", "to": "facebook", "width": 1}, {"from": "Kurmanji", "to": "twitter", "width": 1}, {"from": "Kurmanji", "to": "instagram", "width": 1}, {"from": "Kurmanji", "to": "whatsapp", "width": 1}, {"from": "Kurmanji", "to": "tiktok", "width": 1}, {"from": "Kurmanji", "to": "email", "width": 1}, {"from": "Kurmanji", "to": "sms", "width": 1}, {"from": "Kurmanji", "to": "books", "width": 1}, {"from": "Kurmanji", "to": "poems", "width": 1}, {"from": "Kurmanji", "to": "diaries", "width": 1}, {"from": "Kurmanji", "to": "shopping list", "width": 1}, {"from": "Kurmanji", "to": "stories", "width": 1}, {"from": "Kurmanji", "to": "jokes", "width": 1}, {"from": "Kurmanji", "to": "songs", "width": 1}, {"from": "Kurmanji", "to": "other media", "width": 1}, {"from": "Kurmanji", "to": "when asking for directions", "width": 1}, {"from": "Kurmanji", "to": "with customers", "width": 1}, {"from": "Kurmanji", "to": "when shopping", "width": 1}, {"from": "Kurmanji", "to": "at weddings", "width": 1}, {"from": "Kurmanji", "to": "at funerals", "width": 1}, {"from": "Kurmanji", "to": "at religious ceremonies", "width": 1}, {"from": "Kurmanji", "to": "when dreaming", "width": 1}, {"from": "Kurmanji", "to": "when counting", "width": 1}, {"from": "Kurmanji", "to": "when praying", "width": 1}, {"from": "Kurmanji", "to": "shouting at children", "width": 1}, {"from": "Kurmanji", "to": "explanations to children", "width": 1}, {"from": "Kurmanji", "to": "when cursing", "width": 1}, {"from": "Kurmanji", "to": "when joking", "width": 1}, {"from": "Kurmanji", "to": "speaking about private topics", "width": 1}, {"from": "Kurmanji", "to": "discussing", "width": 1}, {"from": "Kurmanji", "to": "singing", "width": 1}, {"from": "Kurmanji", "to": "playing", "width": 1}, {"from": "Kurmanji", "to": "talking to a beloved person", "width": 1}, {"from": "Kurmanji", "to": "partner", "width": 1}, {"from": "Kurmanji", "to": "children", "width": 1}, {"from": "Kurmanji", "to": "mother", "width": 1}, {"from": "Kurmanji", "to": "father", "width": 1}, {"from": "Kurmanji", "to": "siblings", "width": 1}, {"from": "Kurmanji", "to": "friends", "width": 1}, {"from": "Kurmanji", "to": "relatives", "width": 1}, {"from": "Kurmanji", "to": "neighbours", "width": 1}, {"from": "instagram", "to": "Turkish", "width": 1}, {"from": "instagram", "to": "No language given", "width": 1}, {"from": "instagram", "to": "French", "width": 1}, {"from": "children", "to": "Turkish", "width": 1}, {"from": "children", "to": "Other language", "width": 1}, {"from": "children", "to": "No language given", "width": 1}, {"from": "children", "to": "French", "width": 1}, {"from": "children", "to": "German", "width": 1}, {"from": "father", "to": "Turkish", "width": 1}, {"from": "father", "to": "No language given", "width": 1}, {"from": "neighbours", "to": "Turkish", "width": 1}, {"from": "neighbours", "to": "No language given", "width": 1}, {"from": "neighbours", "to": "French", "width": 1}, {"from": "twitter", "to": "Turkish", "width": 1}, {"from": "twitter", "to": "No language given", "width": 1}, {"from": "twitter", "to": "French", "width": 1}, {"from": "stories", "to": "No language given", "width": 1}, {"from": "stories", "to": "Turkish", "width": 1}, {"from": "when counting", "to": "Turkish", "width": 1}, {"from": "when counting", "to": "No language given", "width": 1}, {"from": "when counting", "to": "Other language", "width": 1}, {"from": "when counting", "to": "French", "width": 1}, {"from": "when counting", "to": "German", "width": 1}, {"from": "other media", "to": "Turkish", "width": 1}, {"from": "other media", "to": "Other language", "width": 1}, {"from": "other media", "to": "No language given", "width": 1}, {"from": "talking to a beloved person", "to": "Other language", "width": 1}, {"from": "talking to a beloved person", "to": "No language given", "width": 1}, {"from": "talking to a beloved person", "to": "Turkish", "width": 1}, {"from": "talking to a beloved person", "to": "French", "width": 1}, {"from": "at the restaurant", "to": "Other language", "width": 1}, {"from": "at the restaurant", "to": "Turkish", "width": 1}, {"from": "at the restaurant", "to": "French", "width": 1}, {"from": "at the restaurant", "to": "No language given", "width": 1}, {"from": "discord", "to": "No language given", "width": 1}, {"from": "discord", "to": "Turkish", "width": 1}, {"from": "when praying", "to": "Turkish", "width": 1}, {"from": "when praying", "to": "No language given", "width": 1}, {"from": "when praying", "to": "German", "width": 1}, {"from": "with customers", "to": "Other language", "width": 1}, {"from": "with customers", "to": "Turkish", "width": 1}, {"from": "with customers", "to": "French", "width": 1}, {"from": "with customers", "to": "No language given", "width": 1}, {"from": "shouting at children", "to": "Turkish", "width": 1}, {"from": "shouting at children", "to": "No language given", "width": 1}, {"from": "shouting at children", "to": "French", "width": 1}, {"from": "singing", "to": "Other language", "width": 1}, {"from": "singing", "to": "Turkish", "width": 1}, {"from": "singing", "to": "No language given", "width": 1}, {"from": "singing", "to": "French", "width": 1}, {"from": "poems", "to": "No language given", "width": 1}, {"from": "poems", "to": "Turkish", "width": 1}, {"from": "at court", "to": "Other language", "width": 1}, {"from": "at court", "to": "Turkish", "width": 1}, {"from": "at court", "to": "French", "width": 1}, {"from": "at court", "to": "No language given", "width": 1}, {"from": "email", "to": "Other language", "width": 1}, {"from": "email", "to": "Turkish", "width": 1}, {"from": "email", "to": "French", "width": 1}, {"from": "email", "to": "No language given", "width": 1}, {"from": "email", "to": "German", "width": 1}, {"from": "when cursing", "to": "Turkish", "width": 1}, {"from": "when cursing", "to": "No language given", "width": 1}, {"from": "when cursing", "to": "French", "width": 1}, {"from": "when cursing", "to": "Other language", "width": 1}, {"from": "when dreaming", "to": "Turkish", "width": 1}, {"from": "when dreaming", "to": "No language given", "width": 1}, {"from": "when dreaming", "to": "German", "width": 1}, {"from": "when dreaming", "to": "Other language", "width": 1}, {"from": "explanations to children", "to": "Other language", "width": 1}, {"from": "explanations to children", "to": "Turkish", "width": 1}, {"from": "explanations to children", "to": "No language given", "width": 1}, {"from": "explanations to children", "to": "French", "width": 1}, {"from": "explanations to children", "to": "German", "width": 1}, {"from": "French", "to": "music", "width": 1}, {"from": "French", "to": "facebook", "width": 1}, {"from": "French", "to": "whatsapp", "width": 1}, {"from": "French", "to": "sms", "width": 1}, {"from": "French", "to": "books", "width": 1}, {"from": "French", "to": "at the doctor", "width": 1}, {"from": "French", "to": "at the police", "width": 1}, {"from": "French", "to": "at the bank", "width": 1}, {"from": "French", "to": "with teachers at school", "width": 1}, {"from": "French", "to": "when asking for directions", "width": 1}, {"from": "French", "to": "when shopping", "width": 1}, {"from": "French", "to": "at weddings", "width": 1}, {"from": "French", "to": "at religious ceremonies", "width": 1}, {"from": "French", "to": "when joking", "width": 1}, {"from": "French", "to": "speaking about private topics", "width": 1}, {"from": "French", "to": "discussing", "width": 1}, {"from": "French", "to": "playing", "width": 1}, {"from": "French", "to": "siblings", "width": 1}, {"from": "French", "to": "friends", "width": 1}, {"from": "French", "to": "relatives", "width": 1}, {"from": "German", "to": "music", "width": 1}, {"from": "German", "to": "sms", "width": 1}, {"from": "German", "to": "books", "width": 1}, {"from": "German", "to": "at weddings", "width": 1}, {"from": "German", "to": "at funerals", "width": 1}, {"from": "German", "to": "at religious ceremonies", "width": 1}, {"from": "German", "to": "partner", "width": 1}, {"from": "German", "to": "mother", "width": 1}, {"from": "German", "to": "siblings", "width": 1}, {"from": "letters", "to": "No language given", "width": 1}, {"from": "letters", "to": "Turkish", "width": 1}, {"from": "tiktok", "to": "No language given", "width": 1}, {"from": "tiktok", "to": "Turkish", "width": 1}, {"from": "friends", "to": "Turkish", "width": 1}, {"from": "friends", "to": "Dutch", "width": 1}, {"from": "friends", "to": "No language given", "width": 1}, {"from": "when joking", "to": "Other language", "width": 1}, {"from": "when joking", "to": "Turkish", "width": 1}, {"from": "when joking", "to": "No language given", "width": 1}, {"from": "discussing", "to": "Other language", "width": 1}, {"from": "discussing", "to": "Turkish", "width": 1}, {"from": "discussing", "to": "No language given", "width": 1}, {"from": "at religious ceremonies", "to": "Turkish", "width": 1}, {"from": "at religious ceremonies", "to": "No language given", "width": 1}, {"from": "at religious ceremonies", "to": "Other language", "width": 1}, {"from": "music", "to": "Turkish", "width": 1}, {"from": "music", "to": "Other language", "width": 1}, {"from": "music", "to": "No language given", "width": 1}, {"from": "facebook", "to": "Turkish", "width": 1}, {"from": "facebook", "to": "No language given", "width": 1}, {"from": "songs", "to": "No language given", "width": 1}, {"from": "songs", "to": "Turkish", "width": 1}, {"from": "Other language", "to": "sms", "width": 1}, {"from": "Other language", "to": "books", "width": 1}, {"from": "Other language", "to": "at the doctor", "width": 1}, {"from": "Other language", "to": "at the police", "width": 1}, {"from": "Other language", "to": "at the bank", "width": 1}, {"from": "Other language", "to": "with teachers at school", "width": 1}, {"from": "Other language", "to": "when asking for directions", "width": 1}, {"from": "Other language", "to": "when shopping", "width": 1}, {"from": "Other language", "to": "speaking about private topics", "width": 1}, {"from": "Other language", "to": "playing", "width": 1}, {"from": "Other language", "to": "mother", "width": 1}, {"from": "at the doctor", "to": "Turkish", "width": 1}, {"from": "at the doctor", "to": "No language given", "width": 1}, {"from": "jokes", "to": "No language given", "width": 1}, {"from": "jokes", "to": "Turkish", "width": 1}, {"from": "siblings", "to": "Turkish", "width": 1}, {"from": "siblings", "to": "No language given", "width": 1}, {"from": "diaries", "to": "No language given", "width": 1}, {"from": "diaries", "to": "Turkish", "width": 1}, {"from": "speaking about private topics", "to": "Turkish", "width": 1}, {"from": "speaking about private topics", "to": "No language given", "width": 1}, {"from": "partner", "to": "Turkish", "width": 1}, {"from": "partner", "to": "No language given", "width": 1}, {"from": "at the police", "to": "Turkish", "width": 1}, {"from": "at the police", "to": "No language given", "width": 1}, {"from": "Turkish", "to": "whatsapp", "width": 1}, {"from": "Turkish", "to": "telegram", "width": 1}, {"from": "Turkish", "to": "sms", "width": 1}, {"from": "Turkish", "to": "books", "width": 1}, {"from": "Turkish", "to": "shopping list", "width": 1}, {"from": "Turkish", "to": "at the bank", "width": 1}, {"from": "Turkish", "to": "with teachers at school", "width": 1}, {"from": "Turkish", "to": "when asking for directions", "width": 1}, {"from": "Turkish", "to": "when shopping", "width": 1}, {"from": "Turkish", "to": "at weddings", "width": 1}, {"from": "Turkish", "to": "at funerals", "width": 1}, {"from": "Turkish", "to": "playing", "width": 1}, {"from": "Turkish", "to": "mother", "width": 1}, {"from": "Turkish", "to": "relatives", "width": 1}, {"from": "at funerals", "to": "No language given", "width": 1}, {"from": "telegram", "to": "No language given", "width": 1}, {"from": "at the bank", "to": "No language given", "width": 1}, {"from": "with teachers at school", "to": "No language given", "width": 1}, {"from": "shopping list", "to": "No language given", "width": 1}, {"from": "playing", "to": "No language given", "width": 1}, {"from": "sms", "to": "No language given", "width": 1}, {"from": "mother", "to": "No language given", "width": 1}, {"from": "relatives", "to": "No language given", "width": 1}, {"from": "books", "to": "No language given", "width": 1}, {"from": "No language given", "to": "whatsapp", "width": 1}, {"from": "No language given", "to": "when asking for directions", "width": 1}, {"from": "No language given", "to": "when shopping", "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"nodes": {"borderWidth": 3, "borderWidthSelected": 80, "color": {"border": "#2B7CE9", "background": "#D2E5FF", "highlight": {"border": "#2B7CE9", "background": "#D2E5FF"}, "hover": {"border": "#2B7CE9", "background": "#D2E5FF"}}, "font": {"color": "#343434", "size": 40}, "size": 50, "scaling": {"enabled": false}}, "edges": {"color": {"inherit": "both"}, "smooth": {"enabled": true, "type": "dynamic"}, "width": 10}, "physics": {"enabled": true, "barnesHut": {"gravitationalConstant": -3000, "centralGravity": 0.005, "springLength": 500, "springConstant": 0.01, "damping": 0.8, "avoidOverlap": 0.7}, "maxVelocity": 1, "minVelocity": 0, "solver": "barnesHut", "timestep": 0.001, "stabilization": {"enabled": true, "fit": true}}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+                    network.on("selectNode", neighbourhoodHighlight);
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html></div>
+    </div>
+    </body>
+<footer>
+    <div class="container-fluid">
+        <p class="text-center">© 2025 Agnes Grond & Salih Akin</p>
+        <p class="text-center"><a href="mailto:agnes.grond@uni-graz.at">agnes.grond@uni-graz.at</a>, <a href="mailto:salih.akin@univ-rouen.fr">salih.akin@univ-rouen.fr</a></p>
+        <p class="text-center">Data Management, Data Visualization and Web Development: Johanna Ofenauer</p>
+        <br></br>
+        <p class="text-center">This work is openly licensed via <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a>.</p>
+    </div>
+</footer>
+    </html>
+    
