@@ -1,5 +1,5 @@
 # The-language-use-web
-Şexbizinî-Kurdish: The Language Use Web explores the communicative connection of community languages with the agents, the domains and the media of communication.
+Şexbizinî-Kurdish: The Language Use Web explores the communicative connection between the community languages and the agents, the domains and the media of communication.
 
 # About the project
 
