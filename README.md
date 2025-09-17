@@ -88,6 +88,4 @@ Salih Akin, [salih.akin@univ-rouen.fr](mailto:salih.akin@univ-rouen.fr)
 # License
 This work is openly licensed via [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).
 
-![OeAD](/assets/img/OeAD_LogoSolo_RGB.png)
-![University of Graz](/assets/img/Logo_Uni-Graz_4c.jpg)
-![University of Rouen-Normandie](/assets/img/logo-univ-rouen-normandie-couleur.png)
+<img src="/img/OeAD_LogoSolo_RGB.png" alt="OeAD" width="250"/> <img src="/img/Logo_Uni-Graz_4c.jpg" alt="University of Graz" width="125"/> <img src="/img/logo-univ-rouen-normandie-couleur.png" alt="University of Rouen-Normandie" width="250"/>
